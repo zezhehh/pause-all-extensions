@@ -12,5 +12,7 @@
     "48": "logo192.png",
     "128": "logo192.png"
   },
-  "permissions": ["management", "storage"]
+  "permissions": ["management", "storage"],
+  "author": "Zezhe Huang",
+  "homepage_url": "https://github.com/kiki0805/pause-all-extensions"
 }
