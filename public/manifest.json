@@ -1,11 +1,11 @@
 {
-  "name": "Pause Extensions",
+  "name": "Pause All Extensions",
   "description": "placegolder",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
-    "default_title": "Pause Extensions"
+    "default_title": "Pause All Extensions"
   },
   "icons": {
     "16": "logo192.png",
