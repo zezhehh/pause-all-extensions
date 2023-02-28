@@ -14,7 +14,6 @@ const App = () => {
   const [extStatus, setExtStatus] = useState<ExtensionInfo[]>([]);
   const [myID, setMyID] = useState<string>("");
   const togglePause = () => {
-    console.log(extStatus);
     if (paused) {
       extStatus.forEach((ext) => {
         const extId = ext.id;
@@ -35,13 +34,13 @@ const App = () => {
         chrome.management.setEnabled(extId, false);
       });
     }
-    chrome.storage.local.set({ pauseExts: !paused });
+    chrome.storage.sync.set({ pauseExts: !paused });
     setPaused(!paused);
   };
 
   useEffect(() => {
     setMyID(chrome.runtime.id);
-    chrome.storage.local.get(["pauseExts"], (res) => {
+    chrome.storage.sync.get(["pauseExts"], (res) => {
       if (res.pauseExts) {
         setPaused(true);
       }
