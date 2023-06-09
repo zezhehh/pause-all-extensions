@@ -7,7 +7,7 @@ import { getExtInfoKey, STORAGE_PREFIX, getGroupInfoKey, groupNumKey, advancedKe
 import PauseController from "./PauseController";
 import ExtStorage from "./Storage";
 import useExtStatus from "./useExtStatus";
-
+import useGroups from "./useGroups";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -28,6 +28,7 @@ const App = () => {
   const [advanced, setAdvanced] = useState(false);
   const [grouping, setGrouping] = useState(false);
   const extStatus = useExtStatus();
+  const groups = useGroups();
   const [selected, setSelected] = useState<string[]>([]);
   const [ungrouped, setUngrouped] = useState<string[]>([]);
 
