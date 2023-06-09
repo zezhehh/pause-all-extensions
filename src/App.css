@@ -51,7 +51,6 @@
   width: calc(100% - 10px);
   margin: 5px !important;
   display: block;
-  position: fixed;
 }
 
 .ext-name {
