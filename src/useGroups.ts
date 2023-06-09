@@ -5,7 +5,7 @@ import { ExtStatus } from "./useExtStatus";
 import _ from "lodash";
 
 export type Groups = {
-  [key: string]: string[]
+  [key: string]: string[];
 };
 
 export type GroupStatus = {
@@ -18,7 +18,7 @@ function useGroups(
 ): [number, Groups, GroupStatus, string[]] {
   const [groupNum, setGroupNum] = useState(0);
   const [groups, setGroups] = useState<Groups>({});
-  const [groupStatus, setGroupStatus] = useState<GroupStatus>({})
+  const [groupStatus, setGroupStatus] = useState<GroupStatus>({});
   const [ungrouped, setUngrouped] = useState<string[]>([]);
 
   const onStorageChange = (
@@ -34,7 +34,7 @@ function useGroups(
     let tmpUngrouped = Object.keys(extStatus);
     let tmpGroups: Groups = {};
     let tmpGroupStatus: GroupStatus = {};
-    
+
     for (let i = 0; i < groupNum; i++) {
       const groupInfoKey = getGroupInfoKey(i);
       const res = await storage.get(groupInfoKey);
@@ -55,7 +55,7 @@ function useGroups(
     if (!_.isEqual(groupStatus, tmpGroupStatus)) {
       setGroupStatus(tmpGroupStatus);
     }
-  }
+  };
 
   useEffect(() => {
     fetchGroups();

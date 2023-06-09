@@ -1,13 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 import Button from "@mui/material/Button";
-import ButtonGroup from '@mui/material/ButtonGroup';
-import DeleteIcon from '@mui/icons-material/Delete';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import CheckIcon from '@mui/icons-material/Check';
+import ButtonGroup from "@mui/material/ButtonGroup";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
+import CheckIcon from "@mui/icons-material/Check";
 import Snackbar from "@mui/material/Snackbar";
-import MuiAlert, { AlertProps, AlertColor } from '@mui/material/Alert';
-import { getExtInfoKey, STORAGE_PREFIX, getGroupInfoKey, groupNumKey, advancedKey } from "./constants";
+import MuiAlert, { AlertProps, AlertColor } from "@mui/material/Alert";
+import {
+  getExtInfoKey,
+  STORAGE_PREFIX,
+  getGroupInfoKey,
+  groupNumKey,
+  advancedKey,
+} from "./constants";
 import PauseController from "./PauseController";
 import ExtStorage from "./Storage";
 import useExtStatus from "./useExtStatus";
@@ -15,16 +21,21 @@ import useGroups from "./useGroups";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
-  ref,
+  ref
 ) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 const App = () => {
   const extStatus = useExtStatus();
-  const storage = useRef<ExtStorage>(new ExtStorage('sync'));
-  const pauseController = useRef<PauseController>(new PauseController(storage.current))
-  const [groupNum, groups, groupStatus, ungrouped] = useGroups(extStatus, storage.current);
+  const storage = useRef<ExtStorage>(new ExtStorage("sync"));
+  const pauseController = useRef<PauseController>(
+    new PauseController(storage.current)
+  );
+  const [groupNum, groups, groupStatus, ungrouped] = useGroups(
+    extStatus,
+    storage.current
+  );
 
   const [paused, setPaused] = useState(false);
   const [open, setOpen] = useState(false);
@@ -49,7 +60,7 @@ const App = () => {
     const storageKey = getExtInfoKey(extID);
     storage.current.set({ [storageKey]: !extEnabled });
     chrome.management.setEnabled(extID, !extEnabled);
-  }
+  };
 
   const toggleGrouping = () => {
     if (grouping) {
@@ -60,8 +71,10 @@ const App = () => {
           return a;
         }, []);
         const groupInfoKey = getGroupInfoKey(groupID);
-        storage.current.set({ [groupInfoKey]: { exts: uniqueSelected, paused: false } })
-        storage.current.set({ [groupNumKey]: groupNum + 1 })
+        storage.current.set({
+          [groupInfoKey]: { exts: uniqueSelected, paused: false },
+        });
+        storage.current.set({ [groupNumKey]: groupNum + 1 });
       }
       setAlertSeverity("info");
       setAlertMsg("Grouping confirmed");
@@ -73,7 +86,7 @@ const App = () => {
       setOpen(true);
     }
     setGrouping(!grouping);
-  }
+  };
 
   useEffect(() => {
     storage.current.get(STORAGE_PREFIX).then((res) => {
@@ -88,8 +101,10 @@ const App = () => {
     });
   }, []);
 
-
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
     if (reason === "clickaway") {
       return;
     }
@@ -99,19 +114,15 @@ const App = () => {
 
   const advancedOnClick = (extID: string, extEnabled: boolean) => {
     if (!grouping) {
-      toggleSingleExt(extID, extEnabled)
+      toggleSingleExt(extID, extEnabled);
       return;
     }
     if (selected.includes(extID)) {
-      setSelected(
-        selected.filter(a =>
-          a !== extID
-        )
-      );
+      setSelected(selected.filter((a) => a !== extID));
     } else {
-      setSelected([...selected, extID])
+      setSelected([...selected, extID]);
     }
-  }
+  };
 
   const renderUngrouped = () => {
     let ungroupedExt: JSX.Element[] = [];
@@ -119,7 +130,15 @@ const App = () => {
       const extEnabled = extStatus[extID].enabled;
       const extShortName = extStatus[extID].shortName;
       ungroupedExt.push(
-        <div className={selected.includes(extID) ? "container container-selected" : "container"} key={extID} onClick={() => advancedOnClick(extID, extEnabled)}>
+        <div
+          className={
+            selected.includes(extID)
+              ? "container container-selected"
+              : "container"
+          }
+          key={extID}
+          onClick={() => advancedOnClick(extID, extEnabled)}
+        >
           <div
             className={
               extEnabled ? "green-indicator-small" : "red-indicator-small"
@@ -127,108 +146,144 @@ const App = () => {
           />{" "}
           <span className="ext-name">{extShortName}</span>
         </div>
-      )
-    })
+      );
+    });
     return ungroupedExt;
-  }
+  };
 
   const toggleAdvanced = () => {
     setGrouping(false);
     setSelected([]);
     setAdvanced(!advanced);
-    storage.current.set({ [advancedKey]: !advanced })
-  }
+    storage.current.set({ [advancedKey]: !advanced });
+  };
 
-  const renderExt = (extID: string, extEnabled: boolean, extShortName: string) => (
-    <div className={selected.includes(extID) ? "container container-selected" : "container"} key={extID} onClick={() => advancedOnClick(extID, extEnabled)}>
+  const renderExt = (
+    extID: string,
+    extEnabled: boolean,
+    extShortName: string
+  ) => (
+    <div
+      className={
+        selected.includes(extID) ? "container container-selected" : "container"
+      }
+      key={extID}
+      onClick={() => advancedOnClick(extID, extEnabled)}
+    >
       <div
-        className={
-          extEnabled ? "green-indicator-small" : "red-indicator-small"
-        }
+        className={extEnabled ? "green-indicator-small" : "red-indicator-small"}
       />{" "}
       <span className="ext-name">{extShortName}</span>
     </div>
-  )
+  );
 
   const groupBar = (groupID: string) => {
-    const extPaused = groupStatus[groupID]
+    const extPaused = groupStatus[groupID];
     return (
       <ButtonGroup size="small" fullWidth>
-        <Button onClick={() => {
-          if (extPaused) {
-            pauseController.current.unpause(...groups[groupID])
-            storage.current.set({ [groupID]: { exts: groups[groupID], paused: false } })
-          }
-          else {
-            pauseController.current.pause(...groups[groupID])
-            storage.current.set({ [groupID]: { exts: groups[groupID], paused: true } })
-          }
-        }} style={{ width: '85%' }}>{extPaused ? 'Resume Group' : 'Pause Group'}</Button>
-        <Button onClick={() => {
-          storage.current.remove(groupID);
-          storage.current.set({ [groupNumKey]: groupNum - 1 })
-          storage.current.set({ [groupNumKey]: groupNum + 1 })
-        }} style={{ borderRadius: 0, width: '15%' }}><DeleteIcon /></Button>
+        <Button
+          onClick={() => {
+            if (extPaused) {
+              pauseController.current.unpause(...groups[groupID]);
+              storage.current.set({
+                [groupID]: { exts: groups[groupID], paused: false },
+              });
+            } else {
+              pauseController.current.pause(...groups[groupID]);
+              storage.current.set({
+                [groupID]: { exts: groups[groupID], paused: true },
+              });
+            }
+          }}
+          style={{ width: "85%" }}
+        >
+          {extPaused ? "Resume Group" : "Pause Group"}
+        </Button>
+        <Button
+          onClick={() => {
+            storage.current.remove(groupID);
+            storage.current.set({ [groupNumKey]: groupNum - 1 });
+            storage.current.set({ [groupNumKey]: groupNum + 1 });
+          }}
+          style={{ borderRadius: 0, width: "15%" }}
+        >
+          <DeleteIcon />
+        </Button>
       </ButtonGroup>
-
-    )
-  }
+    );
+  };
 
   return (
     <div className="App">
-      <div className='toggle-button'>
-        <Button variant="contained" onClick={togglePause} fullWidth style={{marginBottom: 5}}>
-          {paused ? "Resume" : (advanced ? "Pause All" : "Pause")}
+      <div className="toggle-button">
+        <Button
+          variant="contained"
+          onClick={togglePause}
+          fullWidth
+          style={{ marginBottom: 5 }}
+        >
+          {paused ? "Resume" : advanced ? "Pause All" : "Pause"}
         </Button>
-        {advanced ?
+        {advanced ? (
           <ButtonGroup size="small" fullWidth>
-            <Button onClick={toggleAdvanced} style={{ width: '85%' }}>
+            <Button onClick={toggleAdvanced} style={{ width: "85%" }}>
               Switch to Simple
             </Button>
-            <Button onClick={toggleGrouping} style={{ borderRadius: 0, width: '15%' }}>
+            <Button
+              onClick={toggleGrouping}
+              style={{ borderRadius: 0, width: "15%" }}
+            >
               {grouping ? <CheckIcon /> : <LibraryAddIcon />}
             </Button>
           </ButtonGroup>
-          :
-          <Button variant="outlined" size="small" fullWidth onClick={toggleAdvanced}>
+        ) : (
+          <Button
+            variant="outlined"
+            size="small"
+            fullWidth
+            onClick={toggleAdvanced}
+          >
             Switch to Advanced
           </Button>
-        }
+        )}
       </div>
 
       <div className="ext-info">
         {advanced &&
           Object.keys(groups).map((groupID: string) => {
             const group = groups[groupID];
-            return <div key={groupID} className='grouped'>
-              {groupBar(groupID)}
-              {group.map((extID: string) => {
-                const extEnabled = extStatus[extID].enabled;
-                const extShortName = extStatus[extID].shortName;
-                return renderExt(extID, extEnabled, extShortName)
-              })
-              }
-            </div>
-          })
-        }
-        {advanced &&
-          renderUngrouped()
-        }
+            return (
+              <div key={groupID} className="grouped">
+                {groupBar(groupID)}
+                {group.map((extID: string) => {
+                  const extEnabled = extStatus[extID].enabled;
+                  const extShortName = extStatus[extID].shortName;
+                  return renderExt(extID, extEnabled, extShortName);
+                })}
+              </div>
+            );
+          })}
+        {advanced && renderUngrouped()}
 
-        {!advanced && Object.keys(extStatus).map((extID) => {
-          const extEnabled = extStatus[extID].enabled;
-          const extShortName = extStatus[extID].shortName;
-          return (
-            <div className="container" key={extID} onClick={() => toggleSingleExt(extID, extEnabled)}>
+        {!advanced &&
+          Object.keys(extStatus).map((extID) => {
+            const extEnabled = extStatus[extID].enabled;
+            const extShortName = extStatus[extID].shortName;
+            return (
               <div
-                className={
-                  extEnabled ? "green-indicator-small" : "red-indicator-small"
-                }
-              />{" "}
-              <span className="ext-name">{extShortName}</span>
-            </div>
-          )
-        })}
+                className="container"
+                key={extID}
+                onClick={() => toggleSingleExt(extID, extEnabled)}
+              >
+                <div
+                  className={
+                    extEnabled ? "green-indicator-small" : "red-indicator-small"
+                  }
+                />{" "}
+                <span className="ext-name">{extShortName}</span>
+              </div>
+            );
+          })}
       </div>
 
       <Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>

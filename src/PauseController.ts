@@ -1,41 +1,41 @@
-import {getExtInfoKey} from './constants'
-import ExtStorage from './Storage'
+import { getExtInfoKey } from "./constants";
+import ExtStorage from "./Storage";
 
 class PauseController {
-    storage: ExtStorage
-    myID: string
+  storage: ExtStorage;
+  myID: string;
 
-    constructor(storage: ExtStorage) {
-        this.storage = storage
-        this.myID = chrome.runtime.id
-    }
+  constructor(storage: ExtStorage) {
+    this.storage = storage;
+    this.myID = chrome.runtime.id;
+  }
 
-    async pause(...extIDs: string[])  { 
-        let items: {[key: string]: any} = {}
-        for (let i=0; i < extIDs.length; i++) {
-            const extID = extIDs[i]
-            if (extID === this.myID) {
-                continue
-            }
-            const appendedExtID = getExtInfoKey(extID)
-            const extInfo = await chrome.management.get(extID)
-            items = {...items, [appendedExtID]: extInfo.enabled}
-            chrome.management.setEnabled(extID, false);
-        }
-        this.storage.set(items)
+  async pause(...extIDs: string[]) {
+    let items: { [key: string]: any } = {};
+    for (let i = 0; i < extIDs.length; i++) {
+      const extID = extIDs[i];
+      if (extID === this.myID) {
+        continue;
+      }
+      const appendedExtID = getExtInfoKey(extID);
+      const extInfo = await chrome.management.get(extID);
+      items = { ...items, [appendedExtID]: extInfo.enabled };
+      chrome.management.setEnabled(extID, false);
     }
-    
-    unpause(...extIDs: string[]) {
-        extIDs.forEach(extID => {
-            if (extID === this.myID) {
-                return
-            }
-            const storageKey = getExtInfoKey(extID)
-            chrome.storage.sync.get([storageKey], (res) => {
-                chrome.management.setEnabled(extID, res[storageKey]);
-              });
-        });
-    }
+    this.storage.set(items);
+  }
+
+  unpause(...extIDs: string[]) {
+    extIDs.forEach((extID) => {
+      if (extID === this.myID) {
+        return;
+      }
+      const storageKey = getExtInfoKey(extID);
+      chrome.storage.sync.get([storageKey], (res) => {
+        chrome.management.setEnabled(extID, res[storageKey]);
+      });
+    });
+  }
 }
 
-export default PauseController
+export default PauseController;
