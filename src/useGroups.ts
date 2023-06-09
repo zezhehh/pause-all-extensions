@@ -1,21 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import ExtStorage from "./Storage";
 import { groupNumKey, getGroupInfoKey } from "./constants";
 import { ExtStatus } from "./useExtStatus";
+import _ from "lodash";
 
 export type Groups = {
-  [key: string]: {
-    exts: string[];
-    paused: boolean;
-  };
+  [key: string]: string[]
+};
+
+export type GroupStatus = {
+  [key: string]: boolean;
 };
 
 function useGroups(
   extStatus: ExtStatus,
   storage: ExtStorage
-): [number, Groups, string[]] {
+): [number, Groups, GroupStatus, string[]] {
   const [groupNum, setGroupNum] = useState(0);
   const [groups, setGroups] = useState<Groups>({});
+  const [groupStatus, setGroupStatus] = useState<GroupStatus>({})
   const [ungrouped, setUngrouped] = useState<string[]>([]);
 
   const onStorageChange = (
@@ -28,8 +31,10 @@ function useGroups(
   };
 
   const fetchGroups = async () => {
-    setUngrouped(Object.keys(extStatus));
-    setGroups({});
+    let tmpUngrouped = Object.keys(extStatus);
+    let tmpGroups: Groups = {};
+    let tmpGroupStatus: GroupStatus = {};
+    
     for (let i = 0; i < groupNum; i++) {
       const groupInfoKey = getGroupInfoKey(i);
       const res = await storage.get(groupInfoKey);
@@ -37,15 +42,20 @@ function useGroups(
       if (groupInfo === undefined) {
         continue;
       }
-      setGroups((groups) => ({
-        ...groups,
-        [groupInfoKey]: groupInfo,
-      }));
-      setUngrouped((ungrouped) =>
-        ungrouped.filter((id) => !groupInfo.exts.includes(id))
-      );
+      tmpGroups[groupInfoKey] = groupInfo.exts;
+      tmpGroupStatus[groupInfoKey] = groupInfo.paused;
+      tmpUngrouped = tmpUngrouped.filter((id) => !groupInfo.exts.includes(id));
     }
-  };
+    if (!_.isEqual(groups, tmpGroups)) {
+      setGroups(tmpGroups);
+    }
+    if (!_.isEqual(ungrouped, tmpUngrouped)) {
+      setUngrouped(tmpUngrouped);
+    }
+    if (!_.isEqual(groupStatus, tmpGroupStatus)) {
+      setGroupStatus(tmpGroupStatus);
+    }
+  }
 
   useEffect(() => {
     fetchGroups();
@@ -67,7 +77,7 @@ function useGroups(
     };
   }, []);
 
-  return [groupNum, groups, ungrouped];
+  return [groupNum, groups, groupStatus, ungrouped];
 }
 
 export default useGroups;
