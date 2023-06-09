@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 import Button from "@mui/material/Button";
+import ButtonGroup from '@mui/material/ButtonGroup';
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertProps, AlertColor } from '@mui/material/Alert';
 import { getExtInfoKey, STORAGE_PREFIX, getGroupInfoKey, groupNumKey, advancedKey } from "./constants";
@@ -56,8 +57,8 @@ const App = () => {
           return a;
         }, []);
         const groupInfoKey = getGroupInfoKey(groupID);
-        chrome.storage.sync.set({ [groupInfoKey]: uniqueSelected })
-        chrome.storage.sync.set({ [groupNumKey]: groupNum + 1 })
+        storage.current.set({ [groupInfoKey]: { exts: uniqueSelected, paused: false } })
+        storage.current.set({ [groupNumKey]: groupNum + 1 })
       }
       setAlertSeverity("info");
       setAlertMsg("Grouping confirmed");
@@ -72,12 +73,12 @@ const App = () => {
   }
 
   useEffect(() => {
-    chrome.storage.sync.get([STORAGE_PREFIX], (res) => {
+    storage.current.get(STORAGE_PREFIX).then((res) => {
       if (res[STORAGE_PREFIX]) {
         setPaused(true);
       }
     });
-    chrome.storage.sync.get([advancedKey], (res) => {
+    storage.current.get(advancedKey).then((res) => {
       if (res[advancedKey]) {
         setAdvanced(true);
       }
@@ -108,7 +109,7 @@ const App = () => {
       setSelected([...selected, extID])
     }
   }
-  
+
   const renderUngrouped = () => {
     let ungroupedExt: JSX.Element[] = [];
     ungrouped.forEach((extID) => {
@@ -132,7 +133,7 @@ const App = () => {
     setGrouping(false);
     setSelected([]);
     setAdvanced(!advanced);
-    chrome.storage.sync.set({ [advancedKey]: !advanced })
+    storage.current.set({ [advancedKey]: !advanced })
   }
 
   const renderExt = (extID: string, extEnabled: boolean, extShortName: string) => (
@@ -145,6 +146,30 @@ const App = () => {
       <span className="ext-name">{extShortName}</span>
     </div>
   )
+
+  const groupBar = (groupID: string) => {
+    const extPaused = groups[groupID].paused
+    return (
+      <ButtonGroup variant="outlined">
+        <Button onClick={() => {
+          if (extPaused) {
+            pauseController.current.unpause(...groups[groupID].exts)
+            storage.current.set({ [groupID]: { ...groups[groupID], paused: false } })
+          }
+          else {
+            pauseController.current.pause(...groups[groupID].exts)
+            storage.current.set({ [groupID]: { ...groups[groupID], paused: true } })
+          }
+        }}>{extPaused ? 'Resume' : 'Pause'}</Button>
+        <Button onClick={() => {
+          storage.current.remove(groupID);
+          storage.current.set({ [groupNumKey]: groupNum - 1 })
+          storage.current.set({ [groupNumKey]: groupNum + 1 })
+        }}>Remove</Button>
+      </ButtonGroup>
+
+    )
+  }
 
   return (
     <div className="App">
@@ -164,7 +189,8 @@ const App = () => {
           Object.keys(groups).map((groupID: string) => {
             const group = groups[groupID];
             return <div key={groupID} className='grouped'>
-              {group.map((extID: string) => {
+              {groupBar(groupID)}
+              {group.exts.map((extID: string) => {
                 const extEnabled = extStatus[extID].enabled;
                 const extShortName = extStatus[extID].shortName;
                 return renderExt(extID, extEnabled, extShortName)

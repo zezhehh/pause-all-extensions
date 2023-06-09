@@ -27,6 +27,10 @@ class ExtStorage {
     async clear() {
         await this.storage.clear();
     }
+
+    async remove(...keys: string[]) {
+        await this.storage.remove(keys);
+    }
 }
 
 export default ExtStorage;
