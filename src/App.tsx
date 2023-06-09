@@ -18,6 +18,7 @@ import PauseController from "./PauseController";
 import ExtStorage from "./Storage";
 import useExtStatus from "./useExtStatus";
 import useGroups from "./useGroups";
+import ExtensionItem from "./components/ExtensionItem";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -130,25 +131,56 @@ const App = () => {
       const extEnabled = extStatus[extID].enabled;
       const extShortName = extStatus[extID].shortName;
       ungroupedExt.push(
-        <div
-          className={
-            selected.includes(extID)
-              ? "container container-selected"
-              : "container"
-          }
-          key={extID}
-          onClick={() => advancedOnClick(extID, extEnabled)}
-        >
-          <div
-            className={
-              extEnabled ? "green-indicator-small" : "red-indicator-small"
-            }
-          />{" "}
-          <span className="ext-name">{extShortName}</span>
-        </div>
+        <ExtensionItem
+          extID={extID}
+          extEnabled={extEnabled}
+          extShortName={extShortName}
+          selected={selected.includes(extID)}
+          onClick={advancedOnClick}
+        />
       );
     });
     return ungroupedExt;
+  };
+
+  const renderGroups = () => {
+    return Object.keys(groups).map((groupID: string) => {
+      const group = groups[groupID];
+      return (
+        <div key={groupID} className="grouped">
+          {groupBar(groupID)}
+          {group.map((extID: string) => {
+            const extEnabled = extStatus[extID].enabled;
+            const extShortName = extStatus[extID].shortName;
+            return (
+              <ExtensionItem
+                extID={extID}
+                extEnabled={extEnabled}
+                extShortName={extShortName}
+                selected={selected.includes(extID)}
+                onClick={advancedOnClick}
+              />
+            );
+          })}
+        </div>
+      );
+    });
+  };
+
+  const renderAllExtensions = () => {
+    return Object.keys(extStatus).map((extID) => {
+      const extEnabled = extStatus[extID].enabled;
+      const extShortName = extStatus[extID].shortName;
+      return (
+        <ExtensionItem
+          extID={extID}
+          extEnabled={extEnabled}
+          extShortName={extShortName}
+          selected={false}
+          onClick={toggleSingleExt}
+        />
+      );
+    });
   };
 
   const toggleAdvanced = () => {
@@ -157,25 +189,6 @@ const App = () => {
     setAdvanced(!advanced);
     storage.current.set({ [advancedKey]: !advanced });
   };
-
-  const renderExt = (
-    extID: string,
-    extEnabled: boolean,
-    extShortName: string
-  ) => (
-    <div
-      className={
-        selected.includes(extID) ? "container container-selected" : "container"
-      }
-      key={extID}
-      onClick={() => advancedOnClick(extID, extEnabled)}
-    >
-      <div
-        className={extEnabled ? "green-indicator-small" : "red-indicator-small"}
-      />{" "}
-      <span className="ext-name">{extShortName}</span>
-    </div>
-  );
 
   const groupBar = (groupID: string) => {
     const extPaused = groupStatus[groupID];
@@ -249,41 +262,9 @@ const App = () => {
       </div>
 
       <div className="ext-info">
-        {advanced &&
-          Object.keys(groups).map((groupID: string) => {
-            const group = groups[groupID];
-            return (
-              <div key={groupID} className="grouped">
-                {groupBar(groupID)}
-                {group.map((extID: string) => {
-                  const extEnabled = extStatus[extID].enabled;
-                  const extShortName = extStatus[extID].shortName;
-                  return renderExt(extID, extEnabled, extShortName);
-                })}
-              </div>
-            );
-          })}
+        {advanced && renderGroups()}
         {advanced && renderUngrouped()}
-
-        {!advanced &&
-          Object.keys(extStatus).map((extID) => {
-            const extEnabled = extStatus[extID].enabled;
-            const extShortName = extStatus[extID].shortName;
-            return (
-              <div
-                className="container"
-                key={extID}
-                onClick={() => toggleSingleExt(extID, extEnabled)}
-              >
-                <div
-                  className={
-                    extEnabled ? "green-indicator-small" : "red-indicator-small"
-                  }
-                />{" "}
-                <span className="ext-name">{extShortName}</span>
-              </div>
-            );
-          })}
+        {!advanced && renderAllExtensions()}
       </div>
 
       <Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
