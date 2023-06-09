@@ -39,6 +39,14 @@
   align-items: center;
 }
 
+.container-selected {
+  background-color: lightsteelblue;
+}
+
+.container:hover {
+  background-color: aliceblue;
+}
+
 .toggle-button {
   width: calc(100% - 10px);
   margin: 5px !important;
@@ -54,5 +62,6 @@
 
 .ext-info {
   max-height: 400px;
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
