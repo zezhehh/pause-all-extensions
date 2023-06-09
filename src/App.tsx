@@ -17,20 +17,18 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 });
 
 const App = () => {
+  const extStatus = useExtStatus();
   const storage = useRef<ExtStorage>(new ExtStorage('sync'));
   const pauseController = useRef<PauseController>(new PauseController(storage.current))
+  const [groupNum, groups, ungrouped] = useGroups(extStatus, storage.current);
 
   const [paused, setPaused] = useState(false);
   const [open, setOpen] = useState(false);
-  const [groupNum, setGroupNum] = useState(0);
   const [alertSeverity, setAlertSeverity] = useState<AlertColor>("info");
   const [alertMsg, setAlertMsg] = useState("");
   const [advanced, setAdvanced] = useState(false);
   const [grouping, setGrouping] = useState(false);
-  const extStatus = useExtStatus();
-  const groups = useGroups();
   const [selected, setSelected] = useState<string[]>([]);
-  const [ungrouped, setUngrouped] = useState<string[]>([]);
 
   const togglePause = () => {
     const extIDs = Object.keys(extStatus);
@@ -57,9 +55,9 @@ const App = () => {
           if (a.indexOf(b) < 0) a.push(b);
           return a;
         }, []);
-        chrome.storage.sync.set({ [getGroupInfoKey(groupID)]: uniqueSelected })
+        const groupInfoKey = getGroupInfoKey(groupID);
+        chrome.storage.sync.set({ [groupInfoKey]: uniqueSelected })
         chrome.storage.sync.set({ [groupNumKey]: groupNum + 1 })
-        setGroupNum(groupNum + 1);
       }
       setAlertSeverity("info");
       setAlertMsg("Grouping confirmed");
@@ -79,11 +77,6 @@ const App = () => {
         setPaused(true);
       }
     });
-    chrome.storage.sync.get([groupNumKey], (res) => {
-      if (res[groupNumKey]) {
-        setGroupNum(res[groupNumKey]);
-      }
-    })
     chrome.storage.sync.get([advancedKey], (res) => {
       if (res[advancedKey]) {
         setAdvanced(true);
@@ -103,7 +96,6 @@ const App = () => {
   const advancedOnClick = (extID: string, extEnabled: boolean) => {
     if (!grouping) {
       toggleSingleExt(extID, extEnabled)
-      console.log(`toggled ${extID}`)
       return;
     }
     if (selected.includes(extID)) {
@@ -112,50 +104,11 @@ const App = () => {
           a !== extID
         )
       );
-      console.log(`deselected ${extID}`)
     } else {
-      console.log(`selected ${extID}`)
       setSelected([...selected, extID])
     }
   }
-
-  const renderGroups = () => {
-    let groups: JSX.Element[] = [];
-    for (let i = 0; i < groupNum; i++) {
-      const groupInfoKey = getGroupInfoKey(i)
-      chrome.storage.sync.get([groupInfoKey], (res) => {
-        if (res[groupInfoKey]) {
-          groups.push(
-            <div key={`group-${i}`} style={{
-              borderColor: 'red'
-            }}>
-              {res[groupInfoKey].map((extID: string) => {
-                setUngrouped(
-                  ungrouped.filter(a =>
-                    a !== extID
-                  )
-                );
-                const extEnabled = extStatus[extID].enabled;
-                const extShortName = extStatus[extID].shortName;
-                return (
-                  <div className={selected.includes(extID) ? "container container-selected" : "container"} key={extID} onClick={() => advancedOnClick(extID, extEnabled)}>
-                    <div
-                      className={
-                        extEnabled ? "green-indicator-small" : "red-indicator-small"
-                      }
-                    />{" "}
-                    <span className="ext-name">{extShortName}</span>
-                  </div>
-                )
-              })}
-            </div>)
-        }
-      })
-
-    }
-    return groups;
-  }
-
+  
   const renderUngrouped = () => {
     let ungroupedExt: JSX.Element[] = [];
     ungrouped.forEach((extID) => {
@@ -182,6 +135,17 @@ const App = () => {
     chrome.storage.sync.set({ [advancedKey]: !advanced })
   }
 
+  const renderExt = (extID: string, extEnabled: boolean, extShortName: string) => (
+    <div className={selected.includes(extID) ? "container container-selected" : "container"} key={extID} onClick={() => advancedOnClick(extID, extEnabled)}>
+      <div
+        className={
+          extEnabled ? "green-indicator-small" : "red-indicator-small"
+        }
+      />{" "}
+      <span className="ext-name">{extShortName}</span>
+    </div>
+  )
+
   return (
     <div className="App">
 
@@ -197,7 +161,17 @@ const App = () => {
       <div className="ext-info">
 
         {advanced &&
-          renderGroups()
+          Object.keys(groups).map((groupID: string) => {
+            const group = groups[groupID];
+            return <div key={groupID} className='grouped'>
+              {group.map((extID: string) => {
+                const extEnabled = extStatus[extID].enabled;
+                const extShortName = extStatus[extID].shortName;
+                return renderExt(extID, extEnabled, extShortName)
+              })
+              }
+            </div>
+          })
         }
         {advanced &&
           renderUngrouped()
