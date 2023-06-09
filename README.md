@@ -14,7 +14,7 @@ Tired of troublesome extensions causing browser havoc? Meet Pause-All-Extensions
 
 https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
 
-- Group extensions and one click to pause/unpause each group.
+- Group/ungroup extensions and one click to pause/unpause each group.
 - Search bar for installed extensions.
 - Order extensions by name
 - Automatically pause/unpause groups of extensions when the user open/leave specific sites.
