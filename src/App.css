@@ -5,7 +5,11 @@
 .green-indicator {
   width: 10px;
   height: 10px;
-  background: linear-gradient(90deg, hsla(145, 84%, 73%, 1) 0%, hsla(150, 61%, 48%, 1) 100%);
+  background: linear-gradient(
+    90deg,
+    hsla(145, 84%, 73%, 1) 0%,
+    hsla(150, 61%, 48%, 1) 100%
+  );
   border-radius: 50%;
   margin: 5px;
 }
@@ -13,7 +17,11 @@
 .red-indicator {
   width: 10px;
   height: 10px;
-  background: linear-gradient(90deg, hsla(22, 100%, 78%, 1) 0%, hsla(2, 78%, 62%, 1) 100%);
+  background: linear-gradient(
+    90deg,
+    hsla(22, 100%, 78%, 1) 0%,
+    hsla(2, 78%, 62%, 1) 100%
+  );
   border-radius: 50%;
   margin: 5px;
 }
@@ -21,7 +29,11 @@
 .green-indicator-small {
   width: 10px;
   height: 10px;
-  background: linear-gradient(90deg, hsla(145, 84%, 73%, 1) 0%, hsla(150, 61%, 48%, 1) 100%);
+  background: linear-gradient(
+    90deg,
+    hsla(145, 84%, 73%, 1) 0%,
+    hsla(150, 61%, 48%, 1) 100%
+  );
   border-radius: 50%;
   margin: 5px;
 }
@@ -29,7 +41,11 @@
 .red-indicator-small {
   width: 10px;
   height: 10px;
-  background: linear-gradient(90deg, hsla(22, 100%, 78%, 1) 0%, hsla(2, 78%, 62%, 1) 100%);
+  background: linear-gradient(
+    90deg,
+    hsla(22, 100%, 78%, 1) 0%,
+    hsla(2, 78%, 62%, 1) 100%
+  );
   border-radius: 50%;
   margin: 5px;
 }
