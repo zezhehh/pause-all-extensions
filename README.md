@@ -7,15 +7,6 @@ Tired of troublesome extensions causing browser havoc? Meet Pause-All-Extensions
 
 ## Warning
 
-- The status of the extension is synced over devices.
-
-## TODO
-
-https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
-
-- Search bar for installed extensions.
-- Order extensions by name
-- Track MAX_WRITE_OPERATIONS_PER_MINUTE for storage.sync.set
-- Track MAX_WRITE_OPERATIONS_PER_HOUR
-- If extension num + group num > MAX_ITEMS
-
+- The status of the extension is synced over devices by default.
+- If your write frequency is extremely high, go ahead to the option page and set it to local mode.
+  - https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
