@@ -10,3 +10,9 @@ Tired of troublesome extensions causing browser havoc? Meet Pause-All-Extensions
 - The status of the extension is synced over devices by default.
 - If your write frequency is extremely high, go ahead to the option page and set it to local mode.
   - https://developer.chrome.com/docs/extensions/reference/storage/#property-sync
+ 
+<p float="left">
+  <img src="simple.png" height="400" />
+  <img src="advanced.png" height="400" /> 
+</p>
+
