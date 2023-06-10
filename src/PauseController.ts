@@ -32,7 +32,6 @@ class PauseController {
       }
       const storageKey = getExtInfoKey(extID);
       this.storage.get(storageKey).then((res) => {
-        console.log(`unpause ${extID} ${res[storageKey]}`)
         chrome.management.setEnabled(extID, res[storageKey]);
       });
     });

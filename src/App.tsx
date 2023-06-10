@@ -191,27 +191,28 @@ const App = () => {
     storage.current.set({ [advancedKey]: !advanced });
   };
 
+  const toggleGroupPause = (groupID: string) => {
+    if (groupStatus[groupID]) {
+      pauseController.current.unpause(...groups[groupID]);
+      storage.current.set({
+        [groupID]: { exts: groups[groupID], paused: false },
+      });
+    } else {
+      pauseController.current.pause(...groups[groupID]);
+      storage.current.set({
+        [groupID]: { exts: groups[groupID], paused: true },
+      });
+    }
+  };
+
   const groupBar = (groupID: string) => {
-    const extPaused = groupStatus[groupID];
     return (
       <ButtonGroup size="small" fullWidth>
         <Button
-          onClick={() => {
-            if (extPaused) {
-              pauseController.current.unpause(...groups[groupID]);
-              storage.current.set({
-                [groupID]: { exts: groups[groupID], paused: false },
-              });
-            } else {
-              pauseController.current.pause(...groups[groupID]);
-              storage.current.set({
-                [groupID]: { exts: groups[groupID], paused: true },
-              });
-            }
-          }}
+          onClick={() => toggleGroupPause(groupID)}
           style={{ width: "85%" }}
         >
-          {extPaused ? "Resume Group" : "Pause Group"}
+          {groupStatus[groupID] ? "Resume" : "Pause"}
         </Button>
         <Button
           onClick={() => {
@@ -230,15 +231,7 @@ const App = () => {
   return (
     <div className="App">
       <div className="toggle-button">
-        <Button
-          variant="contained"
-          onClick={togglePause}
-          fullWidth
-          style={{ marginBottom: 5 }}
-        >
-          {paused ? "Resume" : advanced ? "Pause All" : "Pause"}
-        </Button>
-        {advanced ? (
+        {advanced && (
           <ButtonGroup size="small" fullWidth>
             <Button onClick={toggleAdvanced} style={{ width: "85%" }}>
               Switch to Simple
@@ -247,17 +240,32 @@ const App = () => {
               onClick={toggleGrouping}
               style={{ borderRadius: 0, width: "15%" }}
             >
-              {grouping ? <Tooltip title="Confirm"><CheckIcon /></Tooltip> : <Tooltip title="Create Group"><LibraryAddIcon /></Tooltip>}
+              {grouping ? (
+                <Tooltip title="Confirm">
+                  <CheckIcon />
+                </Tooltip>
+              ) : (
+                <Tooltip title="Create Group">
+                  <LibraryAddIcon />
+                </Tooltip>
+              )}
             </Button>
           </ButtonGroup>
-        ) : (
+        )}{" "}
+        {!advanced && (
           <Button
             variant="outlined"
             size="small"
             fullWidth
             onClick={toggleAdvanced}
+            style={{ marginBottom: 5 }}
           >
             Switch to Advanced
+          </Button>
+        )}
+        {!advanced && (
+          <Button variant="contained" onClick={togglePause} fullWidth>
+            {paused ? "Resume" : "Pause"}
           </Button>
         )}
       </div>
