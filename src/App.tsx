@@ -6,6 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import CheckIcon from "@mui/icons-material/Check";
 import Snackbar from "@mui/material/Snackbar";
+import { Tooltip } from "@mui/material";
 import MuiAlert, { AlertProps, AlertColor } from "@mui/material/Alert";
 import {
   getExtInfoKey,
@@ -29,7 +30,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
 const App = () => {
   const extStatus = useExtStatus();
-  const storage = useRef<ExtStorage>(new ExtStorage("sync"));
+  const storage = useRef<ExtStorage>(new ExtStorage());
   const pauseController = useRef<PauseController>(
     new PauseController(storage.current)
   );
@@ -246,7 +247,7 @@ const App = () => {
               onClick={toggleGrouping}
               style={{ borderRadius: 0, width: "15%" }}
             >
-              {grouping ? <CheckIcon /> : <LibraryAddIcon />}
+              {grouping ? <Tooltip title="Confirm"><CheckIcon /></Tooltip> : <Tooltip title="Create Group"><LibraryAddIcon /></Tooltip>}
             </Button>
           </ButtonGroup>
         ) : (

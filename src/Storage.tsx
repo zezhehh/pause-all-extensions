@@ -1,19 +1,24 @@
+import { syncModeKey } from "./constants";
+
 // Define a custom string type
 type ExtStorageMode = "local" | "sync";
 
 class ExtStorage {
-  mode: ExtStorageMode;
-  storage: chrome.storage.StorageArea;
+  mode: ExtStorageMode = 'sync';
+  storage: chrome.storage.StorageArea = chrome.storage.sync;
 
-  constructor(mode: ExtStorageMode) {
-    this.mode = mode;
-
-    if (mode === "local") {
-      this.storage = chrome.storage.local;
-    } else {
-      this.storage = chrome.storage.sync;
-    }
+  constructor() {
+    chrome.storage.sync.get([syncModeKey], (result) => {
+        if (result[syncModeKey] === "local") {
+        this.mode = "local";
+        this.storage = chrome.storage.local;
+      } else {
+        this.mode = "sync";
+        this.storage = chrome.storage.sync;
+      }
+    })
   }
+
 
   async get(...keys: string[]) {
     const result = await this.storage.get(keys);

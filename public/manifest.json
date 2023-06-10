@@ -6,6 +6,7 @@
     "default_popup": "index.html",
     "default_title": "Pause All Extensions"
   },
+  "options_page": "option.html",
   "icons": {
     "16": "logo192.png",
     "48": "logo192.png",
