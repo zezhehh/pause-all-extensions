@@ -1,3 +1,7 @@
+Archived. Check out the repo for a more powerful version: https://github.com/zezhehh/pause-all-extensions-v2
+
+---
+
 **Pause chrome extensions with one click.**
 
 Tired of troublesome extensions causing browser havoc? Meet Pause-All-Extensions, the Chrome extension that empowers you with **one-click pausing of all extensions**. More:
